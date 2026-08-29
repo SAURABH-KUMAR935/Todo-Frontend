@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || "https://todo-backend-1-50bxdra22-noizys.vercel.app/api/todos";
+const API_URL = import.meta.env.VITE_API_URL;
 
 async function handleResponse(response) {
     if (!response.ok) {
@@ -11,15 +11,14 @@ async function handleResponse(response) {
 
 async function connect(todo) {
     try {
-        console.log('Adding todo:', todo);
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
+            credentials: 'include', // Important for session cookies
             body: JSON.stringify({ task: todo })
         });
-        console.log('Response status:', response.status);
         return await handleResponse(response);
     } catch (error) {
         console.error('Connect error:', error);
@@ -29,11 +28,10 @@ async function connect(todo) {
 
 async function getTodos() {
     try {
-        console.log('Fetching todos from:', API_URL);
         const response = await fetch(API_URL, {
-            method: 'GET'
+            method: 'GET',
+            credentials: 'include' // Important for session cookies
         });
-        console.log('GET response status:', response.status);
         return await handleResponse(response);
     } catch (error) {
         console.error('GetTodos error:', error);
@@ -44,7 +42,8 @@ async function getTodos() {
 async function deleteTodo(id) {
     try {
         const response = await fetch(`${API_URL}/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            credentials: 'include' // Important for session cookies
         });
         return await handleResponse(response);
     } catch (error) {
@@ -59,6 +58,7 @@ async function updateTodo(id, task) {
             headers: {
                 'Content-Type': 'application/json'
             },
+            credentials: 'include', // Important for session cookies
             body: JSON.stringify({ task })
         });
         return await handleResponse(response);

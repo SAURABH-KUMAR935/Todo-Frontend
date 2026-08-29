@@ -1,7 +1,13 @@
 import React from 'react'
 import connect, { getTodos, deleteTodo, updateTodo } from './services/connection';
+import Login from './components/Login';
+import Register from './components/Register';
+import { checkSession, logout } from './services/auth';
 
 const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [user, setUser] = React.useState(null);
+  const [showRegister, setShowRegister] = React.useState(false);
   const [todos, setTodos] = React.useState([]);
   const [todo, setTodo] = React.useState('');
   const [editIndex, setEditIndex] = React.useState(null);
@@ -11,8 +17,70 @@ const App = () => {
   const [actionLoading, setActionLoading] = React.useState(false);
 
   React.useEffect(() => {
-    fetchTodos();
+    // Check if user has active session on page load
+    const verifySession = async () => {
+      try {
+        console.log('Checking session...');
+        const sessionData = await checkSession();
+        console.log('Session data:', sessionData);
+        if (sessionData.authenticated && sessionData.user) {
+          setUser(sessionData.user);
+          setIsLoggedIn(true);
+          fetchTodos();
+        } else {
+          console.log('No active session found');
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Session check failed:', err);
+        setLoading(false);
+      }
+    };
+
+    verifySession();
   }, []);
+
+  React.useEffect(() => {
+    if (isLoggedIn) {
+      fetchTodos();
+    }
+  }, [isLoggedIn]);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+    setIsLoggedIn(true);
+  };
+
+  const handleRegister = (userData) => {
+    setUser(userData);
+    setIsLoggedIn(true);
+    setShowRegister(false);
+  };
+
+  const handleSwitchToRegister = () => {
+    setShowRegister(true);
+  };
+
+  const handleSwitchToLogin = () => {
+    setShowRegister(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setUser(null);
+      setIsLoggedIn(false);
+      setTodos([]);
+      setShowRegister(false);
+    } catch (err) {
+      console.error('Logout failed:', err);
+      // Still logout locally even if API call fails
+      setUser(null);
+      setIsLoggedIn(false);
+      setTodos([]);
+      setShowRegister(false);
+    }
+  };
 
   const fetchTodos = async () => {
     try {
@@ -100,15 +168,41 @@ const App = () => {
     }
   };
 
+  if (!isLoggedIn) {
+    return showRegister ? (
+      <Register 
+        onRegister={handleRegister} 
+        onSwitchToLogin={handleSwitchToLogin} 
+      />
+    ) : (
+      <Login 
+        onLogin={handleLogin} 
+        onSwitchToRegister={handleSwitchToRegister} 
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100">
       <div className='max-w-2xl mx-auto pt-20 px-4 pb-10'>
         {/* Header */}
         <div className='text-center mb-10'>
-          <h1 className='text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2'>
-            ✨ Todo App
-          </h1>
+          <div className='flex items-center justify-between mb-4'>
+            <div className='flex-1'></div>
+            <h1 className='text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent'>
+              ✨ Todo App
+            </h1>
+            <div className='flex-1 flex justify-end'>
+              <button
+                onClick={handleLogout}
+                className='bg-white hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg'
+              >
+                Logout
+              </button>
+            </div>
+          </div>
           <p className='text-gray-600 text-lg'>Stay organized, get things done</p>
+          {user && <p className='text-gray-500 text-sm mt-1'>Welcome, {user.name}</p>}
         </div>
 
         {/* Error Alert */}
