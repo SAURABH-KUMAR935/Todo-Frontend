@@ -105,7 +105,7 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="John Doe"
+                placeholder="Brijendra Pavani"
                 disabled={loading}
                 className="w-full border-2 border-gray-200 rounded-xl h-12 px-4 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-700 placeholder-gray-400 transition-all duration-300"
                 required
@@ -122,7 +122,7 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder="brijendra@example.com"
                 disabled={loading}
                 className="w-full border-2 border-gray-200 rounded-xl h-12 px-4 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-700 placeholder-gray-400 transition-all duration-300"
                 required
