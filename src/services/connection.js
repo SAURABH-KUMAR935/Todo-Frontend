@@ -1,4 +1,11 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const normalizeUrl = (value, fallback) => {
+    if (!value) return fallback;
+    const trimmed = value.trim().replace(/\/+$/, '');
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    return `https://${trimmed}`;
+};
+
+const API_URL = normalizeUrl(import.meta.env.VITE_API_URL, 'https://todo-backend-noizys.vercel.app/api/todos');
 
 async function handleResponse(response) {
     if (!response.ok) {
